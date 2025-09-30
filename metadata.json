@@ -1,0 +1,5 @@
+{
+  "name": "AI Vücut Analizi",
+  "description": "Yapay zeka kullanarak bir fotoğraftan vücut tipinizi analiz eden ve ilgili anket sorularını otomatik olarak dolduran bir uygulama.",
+  "requestFramePermissions": []
+}
