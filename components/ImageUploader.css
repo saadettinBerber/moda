@@ -1,0 +1,44 @@
+.image-uploader-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem 2.5rem;
+  border-radius: 1.5rem; /* yuvarlak köşeler */
+  background-image: linear-gradient(to top right, #fbc2eb, #a6c1ee); /* gradient arka plan */
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); /* gölge */
+  cursor: pointer;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.image-uploader-container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 30px -10px rgba(166, 193, 238, 0.5);
+}
+
+.upload-icon .material-symbols-outlined {
+  font-size: 4.5rem; /* 7xl */
+  color: white;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+.main-text {
+  font-size: 1.875rem; /* 3xl */
+  font-weight: 700;
+  color: white;
+  margin-top: 1rem;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.sub-text {
+  font-size: 1.125rem; /* lg */
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: 0.5rem;
+}
+
+.file-input {
+  display: none;
+}

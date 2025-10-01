@@ -1,31 +1,17 @@
 import React from 'react';
+import './Header.css';
 
-type Page = 'analysis' | 'chat' | 'results';
-
-interface HeaderProps {
-  activePage: Page;
-  onPageChange: (page: Page) => void;
-}
-
-const Header: React.FC<HeaderProps> = ({ activePage, onPageChange }) => {
+const Header: React.FC = () => {
   return (
-    <header className="kibbe-header">
-      <div className="kibbe-header__content">
-        <div className="kibbe-header__brand">
-          <div className="kibbe-header__logo">
-            K
-          </div>
-          <div className="kibbe-header__title">
-            Kibbe Sistemi
-          </div>
-        </div>
-        
-        <nav className="kibbe-header__nav">
-          <a href="#" className="kibbe-header__nav-link">Hakkımızda</a>
-          <a href="#" className="kibbe-header__nav-link">Anket</a>
-          <a href="#" className="kibbe-header__nav-link">İletişim</a>
-        </nav>
+    <header className="header">
+      <div className="logo">
+        Stil Keşfet
       </div>
+      <nav className="nav-links">
+        <a href="#" className="nav-link">Nasıl Çalışır?</a>
+        <a href="#" className="nav-link">Stil Kartları</a>
+        <a href="#" className="nav-link">Hakkımızda</a>
+      </nav>
     </header>
   );
 };
