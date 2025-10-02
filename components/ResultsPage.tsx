@@ -1,31 +1,53 @@
 import React from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { determineKibbeType } from '../utils/kibbe';
 import type { AnalysisResult } from '../types';
+import { sections } from '../constants';
+import './ResultsPage.css';
 
 interface ResultsPageProps {
-  analysisResult: AnalysisResult | null;
-  imageUrl: string | null;
-  summary: string | null;
-  isSummaryLoading: boolean;
-  onNewAnalysis: () => void;
-  onGoToChat: () => void;
+  initialResult?: AnalysisResult | null;
 }
 
-const ResultsPage: React.FC<ResultsPageProps> = ({
-  analysisResult,
-  imageUrl,
-  summary,
-  isSummaryLoading,
-  onNewAnalysis,
-  onGoToChat,
-}) => {
+const highlightQuestions = [
+  { id: 'I.1', label: 'Dikey Çizgi' },
+  { id: 'I.2', label: 'Omuz Şekli' },
+  { id: 'I.3', label: 'Kol & Bacak' },
+  { id: 'I.4', label: 'El & Ayak' },
+  { id: 'II.1', label: 'Vücut Şekli' },
+  { id: 'IV.3', label: 'Yanaklar' },
+];
+
+const gradientPalette = [
+  'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)',
+  'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+  'linear-gradient(135deg, #f6d365 0%, #fda085 100%)',
+  'linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%)',
+  'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)',
+  'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
+];
+
+const ResultsPage: React.FC<ResultsPageProps> = ({ initialResult = null }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const analysisResult = (location.state as AnalysisResult | null) ?? initialResult;
+
+  const handleNewAnalysis = () => {
+    navigate('/');
+  };
+
+  const handleGoToChat = () => {
+    console.log('Navigating to chat...');
+  };
+
   if (!analysisResult) {
     return (
-      <div className="results-container">
-        <div className="text-center">
-          <h1>Henüz analiz yapılmamış</h1>
-          <button onClick={onNewAnalysis} className="action-btn primary">
-            Analiz Yap
+      <div className="results-empty">
+        <div className="results-empty-card">
+          <h1>Henüz bir analiz bulunamadı.</h1>
+          <p>Önce fotoğrafını yükleyip analizi tamamla, ardından Sonuçlarım sayfasına dön.</p>
+          <button onClick={handleNewAnalysis} className="results-button primary">
+            Yeni Analize Başla
           </button>
         </div>
       </div>
@@ -33,156 +55,164 @@ const ResultsPage: React.FC<ResultsPageProps> = ({
   }
 
   const kibbeType = determineKibbeType(analysisResult);
-  
-  // Kibbe tipi açıklamaları
+
   const getKibbeDescription = (type: string) => {
-    const descriptions: { [key: string]: string } = {
-      'Dramatik': 'Dramatik vücut tipi, yumuşak hatlar, doğrusal ve feminen bir görünümle karakterizedir. Bu tipteyi bireyler genellikle kısa veya orta boylu olup, belirgin göğüslere, geniş kalçalara ve ince bir bele sahiptir. Romantik vücut tipine sahipseniz, giyim seçimlerinizde vücut hatlarınızı vurgulayan, akışkan kumaşları tercih etmelisiniz. Yumuşak, dokulu etekler, bluzlar ve etekler sizin için idealdir.',
-      'Yumuşak Dramatik': 'Yumuşak Dramatik tipi, dramatik ve romantik özelliklerin karışımıdır. Uzun boylu ve açısal yapıya sahip olmakla birlikte, bazı yumuşak detaylar da bulunur.',
-      'Doğal': 'Doğal tip, rahat ve serbest bir yapıya sahiptir. Orta boy ve dengeli vücut hatları ile karakterizedir.',
-      'Yumuşak Doğal': 'Yumuşak Doğal tip, doğal yapının daha feminen versiyonudur. Hafif kıvrımlı hatlar ve yumuşak detaylar içerir.',
-      'Dengeli': 'Dengeli tip, simetrik ve orantılı vücut yapısına sahiptir. Klasik güzellik standartlarını yansıtır.',
-      'Yumuşak Dengeli': 'Yumuşak Dengeli tip, dengeli yapının daha feminen versiyonudur. Hafif yumuşak hatlar içerir.',
-      'Teatral Romantik': 'Teatral Romantik tip, ince yapılı ancak belirgin kıvrımlara sahiptir. Dramatik ve romantik özelliklerin karışımıdır.',
-      'Romantik': 'Romantik vücut tipi, yumuşak hatlar, doğrusal ve feminen bir görünümle karakterizedir. Bu tipteyi bireyler genellikle kısa veya orta boylu olup, belirgin göğüslere, geniş kalçalara ve ince bir bele sahiptir.',
+    const descriptions: Record<string, string> = {
+      'Dramatik': 'Dramatik tip; keskin, uzun ve dengeli çizgileriyle dikkat çeker. Stilinde güçlü silüetler ve net hatlar aramalısın.',
+      'Yumuşak Dramatik': 'Yumuşak Dramatik, dramatik çizgilere sahip olmakla birlikte yumuşak kıvrımlar barındırır. Feminen detayları güçlü parçalarla dengede tutmak sana iyi gelir.',
+      'Doğal': 'Doğal tip, rahat ve serbest bir yapıya sahiptir. Düşük omuz çizgileri ve dengeli silüetler seni en iyi şekilde yansıtır.',
+      'Yumuşak Doğal': 'Yumuşak Doğal, doğal çizgileri daha feminen kıvrımlarla birleştirir. Akışkan kumaşlar ve rahat formlar idealdir.',
+      'Dengeli': 'Dengeli tip (Klasik), simetrik ve zamansız bir uyuma sahiptir. Net hatlı, zarif parçalar senin stilinin temelini oluşturur.',
+      'Yumuşak Dengeli': 'Yumuşak Dengeli (Soft Classic) zarif, simetrik ve hafif yuvarlak detaylarıyla öne çıkar. Akıcı ve detaylı parçalarla uyum yakalarsın.',
+      'Teatral Romantik': 'Teatral Romantik; narin, keskin ve çekici detayları bir araya getirir. Gösterişli kumaşlar ve yapılandırılmış parçalar seni vurgular.',
+      'Romantik': 'Romantik tip, yumuşak hatları, yuvarlak kıvrımları ve feminen zarafetiyle bilinir. Akışkan kumaşlar ve feminen detaylar stilinin anahtarıdır.',
     };
-    
-    return descriptions[type] || 'Bu vücut tipi için özel bir açıklama henüz mevcut değil.';
+
+    return descriptions[type] || 'Bu vücut tipi için henüz özel bir açıklama bulunmuyor, yakında eklenecek!';
   };
 
-  // Stil önerileri
   const getStyleRecommendations = (type: string) => {
-    const recommendations: { [key: string]: { clothing: string[], makeup: string[] } } = {
-      'Dramatik': {
-        clothing: ['Akışkan Bluzlar', 'Yumuşak Bluzlar', 'Hafif Makyaj', 'Doğal Dalgalar'],
-        makeup: ['Doğal Dalgalar', 'Hafif Makyaj', 'Yumuşak Bluzlar', 'Akışkan Bluzlar']
+    const recommendations: Record<string, { clothing: string[]; makeup: string[] }> = {
+      Dramatik: {
+        clothing: ['Keskin omuzlu ceketler', 'Maksi çizgiler', 'Monokrom kombinler'],
+        makeup: ['Belirgin eyeliner', 'Soğuk ton allık', 'Şekilli kaşlar'],
       },
-      'Romantik': {
-        clothing: ['Akışkan Bluzlar', 'Yumuşak Bluzlar', 'Kıvrımlı Kesimler', 'Feminen Detaylar'],
-        makeup: ['Doğal Dalgalar', 'Hafif Makyaj', 'Yumuşak Tonlar', 'Romantik Stil']
+      'Yumuşak Dramatik': {
+        clothing: ['Akışkan elbiseler', 'Bel vurgulu üstler', 'İpek gömlekler'],
+        makeup: ['Yumuşak kontür', 'Saten rujlar', 'Işıltılı göz makyajı'],
+      },
+      Doğal: {
+        clothing: ['Rahat kesim blazer', 'Düz kesim pantolon', 'Kat kat kombinler'],
+        makeup: ['Doğal bronz tonlar', 'Dağınık kaşlar', 'Nemli bitiş'],
+      },
+      'Yumuşak Doğal': {
+        clothing: ['Drape elbiseler', 'Hafif triko', 'Kemerle vurgulanan bel'],
+        makeup: ['Pastel göz tonları', 'Işıltılı ten', 'Yumuşak dudak renkleri'],
+      },
+      Dengeli: {
+        clothing: ['Zarif ceketler', 'Kalem etekler', 'Minimalist elbiseler'],
+        makeup: ['Simetrik eyeliner', 'Şeftali allık', 'Saten rujlar'],
+      },
+      'Yumuşak Dengeli': {
+        clothing: ['Akıcı midi elbiseler', 'V yaka üstler', 'İnce kemerler'],
+        makeup: ['Roz tonlar', 'İpeksi baz', 'Kirpik odağı'],
+      },
+      'Teatral Romantik': {
+        clothing: ['Dantel detaylar', 'Korse formunda üstler', 'Parlak saten kumaşlar'],
+        makeup: ['Keskin eyeliner', 'Parlak dudaklar', 'Işıltılı aydınlatıcı'],
+      },
+      Romantik: {
+        clothing: ['Drapeli elbiseler', 'Kıvrımları saran kumaşlar', 'Fırfırlı detaylar'],
+        makeup: ['Pembe ton allık', 'Dolgun dudaklar', 'Yumuşak gölgeler'],
+      },
+    };
+
+    return (
+      recommendations[type] || {
+        clothing: ['Vücut hatlarını dengeleyen elbiseler', 'Bel vurgulayan parçalar', 'Yumuşak kumaşlar'],
+        makeup: ['Doğal ışıltı', 'Belirgin gözler', 'Canlı dudak tonları'],
       }
-    };
-    
-    return recommendations[type] || {
-      clothing: ['Kişisel Stil', 'Rahat Kesimler', 'Dengeli Görünüm'],
-      makeup: ['Doğal Makyaj', 'Kişisel Tercih', 'Dengeli Yaklaşım']
-    };
+    );
+  };
+
+  const findQuestionDetails = (questionId: string) => {
+    for (const section of sections) {
+      const question = section.questions.find((q) => q.id === questionId);
+      if (question) {
+        const answerId = analysisResult[questionId];
+        const option = question.options.find((opt) => opt.id === answerId);
+        return {
+          question,
+          option,
+        };
+      }
+    }
+
+    return { question: undefined, option: undefined };
   };
 
   const styleRecs = getStyleRecommendations(kibbeType);
 
   return (
-    <div className="results-container fade-in">
-      <div className="results-header">
+    <div className="results-page">
+      <section className="results-hero">
+        <span className="results-kicker">Kibbe Vücut Tipi Analizi</span>
         <h1>Kibbe Vücut Tipi Analiz Sonucunuz</h1>
-      </div>
+        <p>Yapay zekâ analizini gözden geçir, önerileri keşfet ve stil yolculuğunu kişiselleştir.</p>
+      </section>
 
-      <div className="results-card">
-        <div className="results-image">
-          {imageUrl ? (
-            <>
-              <img src={imageUrl} alt="Analiz edilen fotoğraf" />
-              <div className="ai-analysis-badge">
-                <span>🤖</span> Yapay Zeka Analizi
-              </div>
-            </>
-          ) : (
-            <div style={{ 
-              width: '100%', 
-              height: '300px', 
-              background: 'var(--gradient-upload)', 
-              borderRadius: '16px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white',
-              fontSize: '3rem'
-            }}>
-              👤
-            </div>
-          )}
-        </div>
-
-        <div className="results-content">
-          <div className="kibbe-type-badge">
-            SİZİN TİPİNİZ
+      <section className="results-card">
+        <div className="results-visual" aria-hidden>
+          <div className="results-visual-frame">
+            <span>👤</span>
           </div>
-          
-          <h2 className="kibbe-type-title">{kibbeType}</h2>
-          
-          <p className="kibbe-description">
-            {getKibbeDescription(kibbeType)}
-          </p>
+        </div>
+        <div className="results-summary">
+          <span className="results-chip">Sizin Tipiniz</span>
+          <h2>{kibbeType}</h2>
+          <p className="results-description">{getKibbeDescription(kibbeType)}</p>
 
-          <div className="style-recommendations">
-            <div className="recommendation-section">
-              <h4>Giyim Önerileri</h4>
-              <div className="recommendation-list">
-                {styleRecs.clothing.map((item, index) => (
-                  <span key={index} className="recommendation-tag">{item}</span>
+          <div className="results-columns">
+            <div>
+              <h3>Giyim Önerileri</h3>
+              <ul>
+                {styleRecs.clothing.map((item) => (
+                  <li key={item}>{item}</li>
                 ))}
-              </div>
+              </ul>
             </div>
-
-            <div className="recommendation-section">
-              <h4>Saç ve Makyaj Tavsiyeleri</h4>
-              <div className="recommendation-list">
-                {styleRecs.makeup.map((item, index) => (
-                  <span key={index} className="recommendation-tag">{item}</span>
+            <div>
+              <h3>Saç ve Makyaj Tavsiyeleri</h3>
+              <ul>
+                {styleRecs.makeup.map((item) => (
+                  <li key={item}>{item}</li>
                 ))}
-              </div>
+              </ul>
             </div>
           </div>
-
-          {isSummaryLoading && (
-            <div style={{ textAlign: 'center', padding: '2rem' }}>
-              <div className="loading-spinner" style={{ margin: '0 auto' }}></div>
-              <p style={{ marginTop: '1rem', color: 'var(--text-secondary)' }}>
-                Detaylı analiz hazırlanıyor...
-              </p>
-            </div>
-          )}
-
-          {summary && !isSummaryLoading && (
-            <div style={{ 
-              background: 'rgba(139, 92, 246, 0.05)', 
-              padding: '1.5rem', 
-              borderRadius: '16px',
-              marginTop: '1.5rem',
-              border: '1px solid rgba(139, 92, 246, 0.1)'
-            }}>
-              <h4 style={{ marginBottom: '1rem', color: 'var(--text-primary)' }}>
-                🎯 Detaylı Stil Analizi
-              </h4>
-              <p style={{ 
-                whiteSpace: 'pre-wrap', 
-                lineHeight: '1.6',
-                color: 'var(--text-secondary)'
-              }}>
-                {summary}
-              </p>
-            </div>
-          )}
         </div>
-      </div>
+      </section>
 
-      <div className="results-actions">
-        <button onClick={onGoToChat} className="action-btn primary">
+      <section className="ai-analysis">
+        <div className="ai-analysis-header">
+          <h3>Yapay Zeka Analizi</h3>
+          <p>Analiz edilen kilit özellikleri kontrol et, gerekirse yanıtlarını güncelle.</p>
+        </div>
+        <div className="highlight-grid">
+          {highlightQuestions.map((highlight, index) => {
+            const { question, option } = findQuestionDetails(highlight.id);
+            return (
+              <div
+                key={highlight.id}
+                className="highlight-card"
+                style={{ background: gradientPalette[index % gradientPalette.length] }}
+              >
+                <span className="highlight-label">{highlight.label}</span>
+                <span className="highlight-answer">{option ? option.text : 'Yanıt bulunamadı'}</span>
+                {option?.subtext && <span className="highlight-subtext">{option.subtext}</span>}
+                {!option && question && (
+                  <span className="highlight-subtext">Bu soruyu tekrar gözden geçir.</span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="results-actions">
+        <button onClick={handleGoToChat} className="results-button ghost">
           <span>💬</span>
-          Sorularını Kaydet
+          Sonuçlarını Kaydet
         </button>
-        <button onClick={onNewAnalysis} className="action-btn secondary">
+        <button onClick={() => window.print()} className="results-button secondary">
+          <span>🖨️</span>
+          Yazdır
+        </button>
+        <button onClick={handleNewAnalysis} className="results-button primary">
           <span>🔄</span>
-          Yeniden Analiz Et
+          Yeni Analiz Başlat
         </button>
-        <button 
-          onClick={() => window.print()} 
-          className="action-btn secondary"
-        >
-          <span>📄</span>
-          Paylaş
-        </button>
-      </div>
+      </section>
     </div>
   );
 };
